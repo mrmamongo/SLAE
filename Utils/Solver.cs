@@ -13,7 +13,7 @@ public class Kramer : IMethod
 
     public IEnumerable<double> Solve(SqrMatrix a, IList<double> y)
     {
-        var det = SqrMatrix.Determinant(a.Data, (int) a.Size);
+        var det = a.Determinant();
         double[] output = new double[a.Size],
                  temp;
         
@@ -22,7 +22,7 @@ public class Kramer : IMethod
             temp = a.GetColumn(i);
             a.SetColumn(i, y);
 
-            output[i] = SqrMatrix.Determinant(a.Data, (int)a.Size) / det;
+            output[i] = a.Determinant() / det;
             a.SetColumn(i, temp);
         }
 

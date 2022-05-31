@@ -2,17 +2,15 @@
 
 public class SqrMatrix
 {
-    protected SqrMatrix(){}
-
     public SqrMatrix(int size)
     {
         Size = size;
         _data = new double[Size, Size];
     }
-    protected double CachedDet = double.NaN;
+    private double _cachedDet = double.NaN;
     public int Size { get; }
 
-    protected double[,] _data;
+    private double[,] _data;
     
     public ref double[,] Data => ref _data;
 
@@ -22,7 +20,7 @@ public class SqrMatrix
         set
         {
             _data[x, y] = value;
-            CachedDet = double.NaN;
+            _cachedDet = double.NaN;
         }
     }
     
@@ -46,6 +44,12 @@ public class SqrMatrix
             }
         }
     }
+
+    public double Determinant()
+    {
+        return !double.IsNaN(_cachedDet) ? _cachedDet : Determinant(_data, Size);
+    }
+
     public static double Determinant(double[, ] matrix, int size) {
         double det = 0;
         var degree = 1;

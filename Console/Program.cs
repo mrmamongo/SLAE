@@ -1,7 +1,7 @@
 ﻿using Utils;
 
 Console.WriteLine("Enter eq num: ");
-var n = uint.Parse(Console.ReadLine() ?? string.Empty);
+var n = int.Parse(Console.ReadLine() ?? string.Empty);
 
 var a = new SqrMatrix(n);
 var solver = new Solver(new Gauss());
@@ -25,12 +25,12 @@ for (var i = 0; i < a.Size; i++)
 Solver.PrintMtx(a, y);
 
 Console.WriteLine("Choose solution method:\n\t1 - Gauss\n\t2 - Kramer");
-n = uint.Parse(Console.ReadLine() ?? string.Empty);
+n = int.Parse(Console.ReadLine() ?? string.Empty);
 
 while (n != 1 && n != 2)
 {
     Console.WriteLine($"You entered {n} Enter correct value\n");
-    n = uint.Parse(Console.ReadLine() ?? string.Empty); 
+    n = int.Parse(Console.ReadLine() ?? string.Empty); 
 }
 
 if (n == 1)
