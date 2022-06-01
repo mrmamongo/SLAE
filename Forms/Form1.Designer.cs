@@ -30,6 +30,7 @@
         {
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.singleTextBox = new System.Windows.Forms.TextBox();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
@@ -74,6 +75,7 @@
             // 
             // splitContainer3
             // 
+            this.splitContainer3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer3.Location = new System.Drawing.Point(0, 0);
             this.splitContainer3.Name = "splitContainer3";
@@ -81,15 +83,28 @@
             // 
             // splitContainer3.Panel1
             // 
+            this.splitContainer3.Panel1.Controls.Add(this.singleTextBox);
             this.splitContainer3.Panel1.Controls.Add(this.flowLayoutPanel1);
             // 
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.button2);
             this.splitContainer3.Panel2.Controls.Add(this.button1);
-            this.splitContainer3.Size = new System.Drawing.Size(374, 528);
-            this.splitContainer3.SplitterDistance = 446;
+            this.splitContainer3.Size = new System.Drawing.Size(376, 530);
+            this.splitContainer3.SplitterDistance = 447;
             this.splitContainer3.TabIndex = 0;
+            // 
+            // singleTextBox
+            // 
+            this.singleTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.singleTextBox.Location = new System.Drawing.Point(36, 157);
+            this.singleTextBox.Multiline = true;
+            this.singleTextBox.Name = "singleTextBox";
+            this.singleTextBox.Size = new System.Drawing.Size(304, 131);
+            this.singleTextBox.TabIndex = 1;
+            this.singleTextBox.Visible = false;
             // 
             // flowLayoutPanel1
             // 
@@ -99,7 +114,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(10);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(374, 446);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(374, 445);
             this.flowLayoutPanel1.TabIndex = 0;
             this.flowLayoutPanel1.WrapContents = false;
             this.flowLayoutPanel1.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.flowLayoutPanel1_ControlAdded);
@@ -127,6 +142,7 @@
             // 
             // splitContainer1
             // 
+            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
@@ -142,18 +158,19 @@
             this.splitContainer1.Panel2.Controls.Add(this.radioButton2);
             this.splitContainer1.Panel2.Controls.Add(this.radioButton1);
             this.splitContainer1.Panel2.Controls.Add(this.button3);
-            this.splitContainer1.Size = new System.Drawing.Size(619, 528);
+            this.splitContainer1.Size = new System.Drawing.Size(621, 530);
             this.splitContainer1.SplitterDistance = 448;
             this.splitContainer1.TabIndex = 1;
             // 
             // flowLayoutPanel2
             // 
             this.flowLayoutPanel2.AutoScroll = true;
+            this.flowLayoutPanel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(619, 448);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(619, 446);
             this.flowLayoutPanel2.TabIndex = 1;
             this.flowLayoutPanel2.WrapContents = false;
             // 
@@ -186,7 +203,7 @@
             this.button3.Location = new System.Drawing.Point(213, 20);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(211, 46);
-            this.button3.TabIndex = 0;
+            this.button3.TabIndex = 2;
             this.button3.Text = "Решить";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
@@ -207,6 +224,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel1.PerformLayout();
             this.splitContainer3.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
@@ -231,5 +249,6 @@
         private FlowLayoutPanel flowLayoutPanel1;
         private Button button2;
         private Button button1;
+        private TextBox singleTextBox;
     }
 }

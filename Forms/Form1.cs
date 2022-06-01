@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Linq.Expressions;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using Utils;
 
@@ -11,18 +13,25 @@ namespace Forms
         private bool _cached;
         private SqrMatrix _sqrMatrix;
         private double[] _y;
-        private double[] _solution;
+        private string[] _solution;
 
-        private Regex _rg = new(@"(\+|-)?\d+x\d+"),
-            _rgSingle = new(@"(\+|-)?(\d+x^\d+)|\d+");
-
+        private readonly Regex _rg = new(@"(\+|-)?\d+x\d+"),
+            _rgSingle = new (
+                @"(?'tetra'(\+|-)?\d*x\^4)|(?'cube'(\+|-)?\d*x\^3)|(?'quad'(\+|-)?\d*x\^2)|(?'normal'(\+|-)?\d+x)|(?'single'(\+|-)?\d*)"),
+            _rgReplace = new (@"x(\^\d*)?");
         public Form1()
         {
             InitializeComponent();
-            _solver = new Solver(new Kramer());
+            _solver = new Solver(new Kramer(), new Square());
             radioButton1.Checked = true;
+            flowLayoutPanel1.Enabled = false;
+            flowLayoutPanel1.Visible = false;
             flowLayoutPanel1.Controls.Add(new TextBox());
+            singleTextBox.Enabled = true;
+            singleTextBox.Visible = true;
+            singleTextBox.PlaceholderText = "1x^2 + x + 1 = 0";
             flowLayoutPanel1.Controls[^1].Width = 256;
+            (flowLayoutPanel1.Controls[^1] as TextBox)!.PlaceholderText = "x1 + x2 + ... = 1";
             _cached = false;
             radioButton1.Enabled = false;
             radioButton2.Enabled = false;
@@ -32,25 +41,49 @@ namespace Forms
         {
             flowLayoutPanel1.Controls.Add(new TextBox());
             flowLayoutPanel1.Controls[^1].Width = 256;
+            (flowLayoutPanel1.Controls[^1] as TextBox)!.PlaceholderText = "x1 + x2 + ... = 1";
             _cached = false;
+            if (flowLayoutPanel1.Controls.Count < 2) return;
+            flowLayoutPanel1.Enabled = true;
+            flowLayoutPanel1.Visible = true;
+            singleTextBox.Visible = false;
+            singleTextBox.Enabled = false;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (flowLayoutPanel1.Controls.Count <= 1) return;
-            flowLayoutPanel1.Controls.RemoveAt(flowLayoutPanel1.Controls.Count - 1);
-            _cached = false;
+            if (flowLayoutPanel1.Controls.Count >= 2)
+            {
+                flowLayoutPanel1.Controls.RemoveAt(flowLayoutPanel1.Controls.Count - 1);
+                _cached = false;
+            }
+
+            if (flowLayoutPanel1.Controls.Count != 1) return;
+
+            flowLayoutPanel1.Enabled = false;
+            flowLayoutPanel1.Visible = false;
+            singleTextBox.Enabled = true;
+            singleTextBox.Visible = true;
+            singleTextBox.Clear();
+            singleTextBox.PlaceholderText = "1x^2 + x + 1 = 0";
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             while (!_cached)
             {
-                if (flowLayoutPanel1.Controls.Count == 1)
+                if (singleTextBox.Enabled)
                 {
-                    var eq = ParseSingle();
-                    _solution = eq;
-                    break;
+                    try
+                    {
+                        var eq = ParseSingle();
+                        _solution = _solver.Solve(eq).Select(x => x.Imaginary != 0 ? $"{x.Real}+i*({x.Imaginary})" : x.Real.ToString()).ToArray();
+                        break;
+                    }
+                    catch (InvalidDataException)
+                    {
+                        return;
+                    }
                 }
 
                 _sqrMatrix = new SqrMatrix(flowLayoutPanel1.Controls.Count);
@@ -68,7 +101,7 @@ namespace Forms
                         return;
                     }
                 }
-                _solution = _solver.Solve(_sqrMatrix, _y).ToArray();
+                _solution = _solver.Solve(_sqrMatrix, _y).Select(x => x.ToString(CultureInfo.CurrentCulture)).ToArray();
                 _cached = true;
             }
 
@@ -78,67 +111,76 @@ namespace Forms
         private void FillSolution()
         {
             flowLayoutPanel2.Controls.Clear();
+            if (_solution.All(x => x == _solution[0]))
+            {
+                CreateTextNode($"y = {_solution}");
+                return;
+            }
             for (var i = 0; i < _solution.Length; ++i)
             {
-                flowLayoutPanel2.Controls.Add(new TextBox());
-                flowLayoutPanel2.Controls[^1].Text = $"y[{i}] = {_solution[i]}";
-                flowLayoutPanel2.Controls[^1].IsAccessible = false;
-                flowLayoutPanel1.Controls[^1].Width = 128;
+                CreateTextNode($"y[{i}] = {_solution[i]}");
             }
         }
 
-        private double[] ParseSingle()
+        private void CreateTextNode(string msg)
+        {
+            flowLayoutPanel2.Controls.Add(new TextBox());
+            flowLayoutPanel2.Controls[^1].Text = msg;
+            (flowLayoutPanel2.Controls[^1] as TextBox).ReadOnly = true;
+            flowLayoutPanel2.Controls[^1].Width = 512;
+        }
+
+        private List<double> ParseSingle()
         {
             var output = new List<double>();
-            var eq = flowLayoutPanel1.Controls[0].Text.Split('=');
+            var eq = singleTextBox.Text.Replace(" ", "").Split('=');
             if (eq.Length != 2)
             {
-                MessageBox.Show($"Неправильно введено уравнение");
+                MessageBox.Show($"Неправильно введено уравнение. Проверьте знак '='");
                 throw new InvalidDataException();
 
             }
 
-            var operands = _rg.Matches(eq[0]);
-            foreach (var op in operands)
+            var nums = _rgSingle.Matches(eq[0]);
+            var groups = new Dictionary<string, double>
             {
-                var nums = op.ToString()!.Split('x');
-                if (nums.Length != 2)
-                {
-                    MessageBox.Show($"Неправильно введено уравнение");
-                    throw new InvalidDataException();
-                }
+                {"tetra", 0}, {"cube", 0}, {"quad", 0}, {"normal", 0}, {"single", 0}
+            };
 
-                if (int.TryParse(nums[1], out var n))
+            foreach (Match m in nums)
+            {
+                foreach (Group op in m.Groups)
                 {
-                    if (double.TryParse(nums[0], out var v))
+                    if (!op.Success || !groups.ContainsKey(op.Name)) continue;
+
+
+                    foreach (Capture c in op.Captures)
                     {
-                        output.Add(v);
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Неправильно введено уравнение");
-                        throw new InvalidDataException();
+                        var val = _rgReplace.Replace(c.Value, "");
+                        if (val.Length == 0 || !val.All(x => char.IsDigit(x) || x is '+' or '-')) continue;
+                        if (double.TryParse(val, out var r))
+                        {
+                            groups[op.Name] += r;
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Ошибка чтения операнда: {c.Value}");
+                        }
                     }
                 }
-                else
-                {
-                    MessageBox.Show($"Неправильно введено уравнение");
-                    throw new InvalidDataException();
-                }
             }
 
+            output.Add(groups["tetra"]);
+            // MessageBox.Show($"Parsed cube: {groups["cube"]}");
+            output.Add(groups["cube"]);
+            // MessageBox.Show($"Parsed quad: {groups["quad"]}");
+            output.Add(groups["quad"]);
 
-            if (double.TryParse(eq[1], out var res))
-            {
-                output.Add(res);
-            }
-            else
-            {
-                MessageBox.Show($"Неправильно введено уравнение");
-                throw new InvalidDataException();
-            }
-
-            return output.ToArray();
+            // MessageBox.Show($"Parsed normal: {groups["normal"]}");
+            output.Add(groups["normal"]);
+            // MessageBox.Show($"Parsed single: {groups["single"]}");
+            output.Add(groups["single"]);
+            return output;
         }
 
         private double[] ParseEq(int i)
@@ -147,7 +189,7 @@ namespace Forms
             var eq = flowLayoutPanel1.Controls[i].Text.Split("=");
             if (eq.Length != 2)
             {
-                MessageBox.Show($"Неправильно введено уравнение {i}");
+                MessageBox.Show($"Неправильно введено уравнение {i}. Проверьте знак '='");
                 throw new InvalidDataException();
             }
             var operands = _rg.Matches(eq[0]);
