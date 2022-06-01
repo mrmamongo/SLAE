@@ -125,6 +125,9 @@ public class Square : IMethodSingle
         if (_isBi)
         {
             _isBi = false;
+
+            y[3] = y[2];
+            y[2] = y[0];
             var sol = Solve(y).ToList();
 
             return new List<Complex>

@@ -77,7 +77,7 @@ namespace Forms
                     try
                     {
                         var eq = ParseSingle();
-                        _solution = _solver.Solve(eq).Select(x => x.Imaginary != 0 ? $"{x.Real}+i*({x.Imaginary})" : x.Real.ToString()).ToArray();
+                        _solution = _solver.Solve(eq).Select(x => x.Imaginary != 0 ? $"{x.Real:F5}+i*({x.Imaginary:F5})" : $"{x.Real:F5}").ToArray();
                         break;
                     }
                     catch (InvalidDataException)
@@ -101,7 +101,7 @@ namespace Forms
                         return;
                     }
                 }
-                _solution = _solver.Solve(_sqrMatrix, _y).Select(x => x.ToString(CultureInfo.CurrentCulture)).ToArray();
+                _solution = _solver.Solve(_sqrMatrix, _y).Select(x => $"{x:F5}").ToArray();
                 _cached = true;
             }
 
