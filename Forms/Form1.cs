@@ -113,7 +113,7 @@ namespace Forms
             flowLayoutPanel2.Controls.Clear();
             if (_solution.All(x => x == _solution[0]))
             {
-                CreateTextNode($"y = {_solution}");
+                CreateTextNode($"y = {_solution[0]}");
                 return;
             }
             for (var i = 0; i < _solution.Length; ++i)
