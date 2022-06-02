@@ -108,6 +108,9 @@ namespace Forms
             FillSolution();
         }
 
+        /// <summary>
+        /// Метод для заполнения решений в GUI
+        /// </summary>
         private void FillSolution()
         {
             flowLayoutPanel2.Controls.Clear();
@@ -122,6 +125,10 @@ namespace Forms
             }
         }
 
+        /// <summary>
+        /// Метод для создания текстового поля. DRY
+        /// </summary>
+        /// <param name="msg"></param>
         private void CreateTextNode(string msg)
         {
             flowLayoutPanel2.Controls.Add(new TextBox());
@@ -133,7 +140,7 @@ namespace Forms
         private List<double> ParseSingle()
         {
             var output = new List<double>();
-            var eq = singleTextBox.Text.Replace(" ", "").Split('=');
+            var eq = singleTextBox.Text.Replace(" ", "").Split('='); // Избавляемся от всех пробелов и делим уравнение на 2 части
             if (eq.Length != 2)
             {
                 MessageBox.Show($"Неправильно введено уравнение. Проверьте знак '='");
@@ -141,8 +148,8 @@ namespace Forms
 
             }
 
-            var nums = _rgSingle.Matches(eq[0]);
-            var groups = new Dictionary<string, double>
+            var nums = _rgSingle.Matches(eq[0]); // Парсинг левой части уравнения с помощью регулярных выражений
+            var groups = new Dictionary<string, double> // Виды операндов
             {
                 {"tetra", 0}, {"cube", 0}, {"quad", 0}, {"normal", 0}, {"single", 0}
             };
@@ -170,6 +177,7 @@ namespace Forms
                 }
             }
 
+            // Заполнение списка вывода распознанными значениями
             output.Add(groups["tetra"]);
             // MessageBox.Show($"Parsed cube: {groups["cube"]}");
             output.Add(groups["cube"]);
@@ -186,7 +194,7 @@ namespace Forms
         private double[] ParseEq(int i)
         {
             var output = new double[flowLayoutPanel1.Controls.Count + 1];
-            var eq = flowLayoutPanel1.Controls[i].Text.Split("=");
+            var eq = flowLayoutPanel1.Controls[i].Text.Split("="); // Разделение одного уравнения на левую и правую часть
             if (eq.Length != 2)
             {
                 MessageBox.Show($"Неправильно введено уравнение {i}. Проверьте знак '='");

@@ -2,10 +2,24 @@
 
 namespace Utils;
 
+
+/// <summary>
+/// В данной программе реализован паттерн "Стратегия".
+/// Паттерн предполагает наличие нескольких "стратегий", которые сменяются, в зависимости от обстоятельств
+/// </summary>
+
+
+/// <summary>
+/// Стратегия решения одиночных уравнений
+/// </summary>
 public interface IMethodSingle
 {
     public IEnumerable<Complex> Solve(IList<double> y);
 }
+
+/// <summary>
+/// Стратегия решения СЛАУ
+/// </summary>
 public interface IMethod
 {
     public IEnumerable<double> Solve(SqrMatrix a, IList<double> y);
@@ -228,11 +242,24 @@ public class Solver
         _methodSingle = methodSingle;
     }
 
+    /// <summary>
+    /// Метод для решения СЛАУ.
+    /// Выбор конкретной стратегии осуществляется посредством radioButton в GUI
+    /// </summary>
+    /// <param name="a"> Матрица множителей корней </param>
+    /// <param name="y"> Список свободных корней </param>
+    /// <returns> Решение в вещественных числах </returns>
     public IEnumerable<double> Solve(SqrMatrix a, IList<double> y)
     {
         return _method.Solve(a, y);
     }
 
+    /// <summary>
+    /// Метод для определения и решения одиночных уравнений.
+    /// Автоматически определяет, основываясь на наличии операндов в определённой степени
+    /// </summary>
+    /// <param name="a"> Список операндов </param>
+    /// <returns> Корни уравнения в комплексных числах </returns>
     public IEnumerable<Complex> Solve(IList<double> a)
     {
         if (a.Count != 5) return Array.Empty<Complex>();
@@ -268,6 +295,12 @@ public class Solver
 
     } 
 
+
+    /// <summary>
+    /// Функция для дебага. Печатает СЛАУ на консоль
+    /// </summary>
+    /// <param name="a"> Матрица множителей корней </param>
+    /// <param name="y"> Список свободных корней </param>
     public static void PrintMtx(SqrMatrix a, IList<double> y)
     {
         for (var i = 0; i < a.Size; ++i)
